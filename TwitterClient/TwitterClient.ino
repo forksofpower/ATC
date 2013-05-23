@@ -17,8 +17,9 @@
  Patrick Jones
  
 This code is in the public domain.
+*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////// 
- */
+
 #include <SPI.h>
 #include <Ethernet.h>
 #include <Wire.h>
@@ -49,16 +50,15 @@ EthernetClient client;
 const unsigned long requestInterval = 30000;    // delay between requests
 char serverName[] = "api.twitter.com";          // twitter URL
 boolean requested;                              // whether you've made a request since connecting
-unsigned long lastAttemptTime = 0;              // last time you connected to the server, in milliseconds
-String spacer = "                        ";         //A spacer to be added in between strings
+unsigned long lastAttemptTime, timer = 0;              // last time you connected to the server, in milliseconds
+String spacer = "                        ";     //A spacer to be added in between strings
 String username = "jones_private";
-String currentLine = "";            // string to hold the text from server
-String tweet = "";                  // string to hold the tweet
-String temp = "";
-char* tweetlets[9];                             // An array of 16 character strings
-char test[16];
+String currentLine, tweet, botTmp, topTmp = "";            // string to hold the text from server
+int plh1, plh2, plh3 = 0;
+int msgDelay = 3000;
 boolean readingTweet = false;       // if you're currently reading the tweet
-int lastTweetLength = tweet.length();
+
+
 void setup() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // reserve space for the strings:
@@ -83,16 +83,16 @@ void setup() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////  
 // DHCP Troubleshooting
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-  //Serial.print("My address:");
-  //Serial.println(Ethernet.localIP());
+  Serial.print("My address:");
+  Serial.println(Ethernet.localIP());
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // Display username
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-  lcd.clear();
-  delay(1000);
-  lcd.print("Following: " + username);
-  delay(1000);
-  lcd.clear();
+//  lcd.clear();
+//  delay(1000);
+//  lcd.print("Following: " + username);
+//  delay(1000);
+//  lcd.clear();
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // connect to Twitter:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,8 +110,7 @@ void loop()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // add incoming byte to end of line:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-      currentLine += inChar; 
-
+      currentLine += inChar;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
       // if you get a newline, clear the line:
       if (inChar == '\n') {
@@ -125,6 +124,7 @@ void loop()
         // tweet is beginning. Clear the tweet string:
         readingTweet = true; 
         tweet = "";
+        Serial.print("Reading tweet");
       }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
       // if you're currently reading the bytes of a tweet,
@@ -141,27 +141,39 @@ void loop()
           readingTweet = false;
           // close the connection to the server:
           client.stop();
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-          processTweet();
-          // Modify dat tweet
-          tweet.replace(">", "");
-          Serial.println(tweet);
-          Serial.print(currentLine);
-          lastTweetLength = tweet.length();
-          //for(int x=0;x < lastTweetLength;x + 16){
-          for(int x=0;x < 145;x= x + 16){
-            int tmpnum = (x+16)/16;
-            temp = tweet.substring(x, x+16);
-            //temp.toCharArray(test[tmpnum],16);
-            Serial.write(test[tmpnum]);
-            Serial.print("\n");
-            //Serial.print(tweetlets[tmpnum] + "\n");
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-          }
-          
-          Serial.println(tweet);
           lcd.clear();
-          lcd.print(tweetlets[3]);
+          tweet.replace(">", "");
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+          while(timer < 25000
+            for (int x = 0;x < 145; x = x + 32){
+              plh1 = x;
+              plh2 = plh1 + 16;
+              plh3 = plh2 + 16;
+              Serial.print(plh1);
+              Serial.print("\n");
+              Serial.print(plh2);
+              Serial.print("\n");
+              Serial.print(plh3);
+              Serial.print("\n");
+              topTmp = tweet.substring(plh1,plh2);
+              Serial.print(topTmp);
+              Serial.print("\n");
+              botTmp = tweet.substring(plh2,plh3);
+              Serial.print(botTmp);
+              Serial.print("\n");
+              if(topTmp.substring(0,1) != ""){
+                lcd.print(topTmp + spacer + botTmp + spacer);
+              }
+              else {
+                Serial.print("\nNo more characters in tweet\n");
+                break;
+              }
+              delay(msgDelay); 
+            }
+            lcd.clear();
+            delay(500);
+            lcd.print("Done");
+            Serial.print("Done");
         }
       }
     }   
@@ -171,7 +183,7 @@ void loop()
     // your last connection, then attempt to connect again:
     connectToServer();
   }
-}
+  }
 
 void connectToServer() {
   // attempt to connect, and wait a millisecond:
@@ -186,8 +198,3 @@ void connectToServer() {
   // note the time of this connect attempt:
   lastAttemptTime = millis();
 }
-
-String processTweet(
-
-//This test is a longer one...... will this work?
-// 11111111111111112222222222222222333333333333333344444444444444445555555555555555666666666666666677777777777777778888888888
