@@ -47,16 +47,16 @@ IPAddress ip(192,168,1,20);
 //Lots of Variables
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 EthernetClient client;
-const unsigned long requestInterval = 30000;// delay between requests
-char serverName[] = "api.twitter.com";          // Twitter URL
-boolean requested;                              // Whether you've made a request since connecting
-unsigned long lastAttemptTime, timer = 0;       // Last time you connected to the server, in milliseconds
-String spacer = "                        ";     // A spacer to be added in between strings
-String username = "jones_private";              // Username of twitter account being followed
-String currentLine, tweet, botTmp, topTmp = ""; // string to hold the text from server
-int plh1, plh2, plh3 = 0;                       // placeholders for spacing in
-int msgDelay = 3000;
-boolean readingTweet = false;       // if you're currently reading the tweet
+const unsigned long requestInterval = 30000;     // Delay between requests
+char serverName[] = "api.twitter.com";           // Twitter URL
+boolean requested;                               // Whether you've made a request since connecting
+unsigned long lastAttemptTime, timer,tmpText = 0;// Last time you connected to the server, in milliseconds
+String spacer = "                        ";      // A spacer to be added in between strings
+String username = "jones_private";               // Username of twitter account being followed
+String currentLine, tweet, botTmp, topTmp= "";   // String to hold the text from server
+int plh1, plh2, plh3 = 0;                        // Placeholders for spacing in
+int msgDelay = 3000;                             // Length of time to wait between changing pages
+boolean readingTweet = false;                    // If you're currently reading the tweet
 
 
 void setup() {
@@ -138,17 +138,22 @@ void loop()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
           // if you got a "<" character,
           // you've reached the end of the tweet:
-          readingTweet = false;
+          
           // close the connection to the server:
           client.stop();
           lcd.clear();
           tweet.replace(">", "");
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-          while(millis() - timer < 25000){
+          timer = 0;
+          timer = millis();
+          while((millis() - timer) < 25000){
+            lcd.clear();
             for (int x = 0;x < 145; x = x + 32){
               plh1 = x;
               plh2 = plh1 + 16;
               plh3 = plh2 + 16;
+              Serial.print("\n");
+              Serial.print("\n");
               Serial.print(plh1);
               Serial.print("\n");
               Serial.print(plh2);
@@ -170,22 +175,21 @@ void loop()
               }
               delay(msgDelay); 
             }
-            lcd.clear();
-            delay(500);
-            timer = millis()
-            lcd.print("Done");
             Serial.print("Done");
-        }
-      }
-    }   
-  }
+            tmpText = millis() - timer;
+            Serial.print("\n");
+            Serial.print("Timer: ");
+            Serial.print(tmpText);
+        } readingTweet = false;
+      } 
+    }  
   else if (millis() - lastAttemptTime > requestInterval) {
     // if you're not connected, and two minutes have passed since
     // your last connection, then attempt to connect again:
     connectToServer();
   }
-  }
-
+}
+  }}
 void connectToServer() {
   // attempt to connect, and wait a millisecond:
   Serial.println("connecting to server...");
