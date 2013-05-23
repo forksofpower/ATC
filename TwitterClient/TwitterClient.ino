@@ -47,14 +47,14 @@ IPAddress ip(192,168,1,20);
 //Lots of Variables
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 EthernetClient client;
-const unsigned long requestInterval = 30000;    // delay between requests
-char serverName[] = "api.twitter.com";          // twitter URL
-boolean requested;                              // whether you've made a request since connecting
-unsigned long lastAttemptTime, timer = 0;              // last time you connected to the server, in milliseconds
-String spacer = "                        ";     //A spacer to be added in between strings
-String username = "jones_private";
-String currentLine, tweet, botTmp, topTmp = "";            // string to hold the text from server
-int plh1, plh2, plh3 = 0;
+const unsigned long requestInterval = 30000;// delay between requests
+char serverName[] = "api.twitter.com";          // Twitter URL
+boolean requested;                              // Whether you've made a request since connecting
+unsigned long lastAttemptTime, timer = 0;       // Last time you connected to the server, in milliseconds
+String spacer = "                        ";     // A spacer to be added in between strings
+String username = "jones_private";              // Username of twitter account being followed
+String currentLine, tweet, botTmp, topTmp = ""; // string to hold the text from server
+int plh1, plh2, plh3 = 0;                       // placeholders for spacing in
 int msgDelay = 3000;
 boolean readingTweet = false;       // if you're currently reading the tweet
 
@@ -144,7 +144,7 @@ void loop()
           lcd.clear();
           tweet.replace(">", "");
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-          while(timer < 25000
+          while(millis() - timer < 25000){
             for (int x = 0;x < 145; x = x + 32){
               plh1 = x;
               plh2 = plh1 + 16;
@@ -172,6 +172,7 @@ void loop()
             }
             lcd.clear();
             delay(500);
+            timer = millis()
             lcd.print("Done");
             Serial.print("Done");
         }
